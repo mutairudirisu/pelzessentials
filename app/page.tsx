@@ -1,69 +1,125 @@
 import Image from "next/image";
+import { HeroSlider, type HeroSlide } from "@/app/components/hero-slider";
+import { ShopSection } from "@/app/components/shop-section";
+import { getCatalog } from "@/lib/catalog-server";
 
-export default function Home() {
+export default async function Home() {
+  const products = await getCatalog();
+  const moments = ["Plush blankets", "Tote bags", "Gym mats", "Personal essentials"].flatMap(
+    (category) => {
+      const product = products.find((item) => item.category === category);
+      return product ? [product] : [];
+    },
+  );
+  const editorialProduct = products.find((product) => product.category === "Plush blankets");
+  const featuredCategories = [
+    {
+      category: "Plush blankets",
+      eyebrow: "Wrap yourself in comfort",
+      title: "Cloud-soft days start at home.",
+      description: "Plush layers for slow mornings and softer evenings.",
+    },
+    {
+      category: "Tote bags",
+      eyebrow: "Take a little ease with you",
+      title: "Everyday plans, well carried.",
+      description: "Roomy, ready-to-go favorites for wherever the day leads.",
+    },
+    {
+      category: "Gym mats",
+      eyebrow: "Make a little space for you",
+      title: "Find your flow, your way.",
+      description: "Comfortable essentials for your next moment of movement.",
+    },
+    {
+      category: "Personal essentials",
+      eyebrow: "Small rituals, lovely days",
+      title: "A little care goes a long way.",
+      description: "Everyday care and thoughtful details, gathered in one place.",
+    },
+    {
+      category: "Gym bags",
+      eyebrow: "From here to your next thing",
+      title: "Good things, ready to go.",
+      description: "Practical gym companions with room for all your essentials.",
+    },
+    {
+      category: "Dolphin bags",
+      eyebrow: "Carry your day with confidence",
+      title: "Your next favorite is right here.",
+      description: "A considered collection of bags for the everyday and beyond.",
+    },
+  ];
+  const slides: HeroSlide[] = featuredCategories.flatMap((featured) => {
+    const product = products.find((item) => item.category === featured.category);
+    return product ? [{ ...featured, image: product.image_url, alt: product.name }] : [];
+  });
+
   return (
-    <div className="flex flex-col flex-1 items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex flex-1 w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert h-5 w-[100px]"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the{" "}
-            <code className="rounded bg-black/[.06] px-1.5 py-0.5 font-mono text-[0.9em] dark:bg-white/[.08]">
-              page.tsx
-            </code>{" "}
-            file.
-          </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
-          </p>
-        </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
+    <>
+      <HeroSlider slides={slides} />
+      <nav className="category-strip" aria-label="Shop by category">
+        {[
+          "Plush blankets",
+          "Tote bags",
+          "Gym mats",
+          "Personal essentials",
+          "Gym bags",
+          "Dolphin bags",
+        ].map((category, index) => (
+          <a className="category-link" href="#shop" key={category}>
+            <span className="category-index">0{index + 1}</span>
+            {category}
+          </a>
+        ))}
+      </nav>
+      <ShopSection products={products} />
+      <section className="editorial">
+        <div className="editorial-frame">
+          <div className="editorial-image">
             <Image
-              className="dark:invert h-[14px] w-4"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={14}
+              src={editorialProduct?.image_url ?? products[0].image_url}
+              alt={editorialProduct?.name ?? "Pelz Essentials product"}
+              fill
+              sizes="(max-width: 640px) 90vw, 45vw"
             />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
+          </div>
+          <div className="editorial-copy">
+            <p className="eyebrow">The everyday, elevated</p>
+            <h2>Small comforts. Better days.</h2>
+            <p>
+              From slow mornings at home to everything you carry out the door, find the pieces that
+              make your everyday feel a little more like you.
+            </p>
+            <a className="button button-outline" href="#shop">
+              Find your favorites
+            </a>
+          </div>
+        </div>
+      </section>
+      <section className="social-section">
+        <div className="social-heading">
+          <div>
+            <p className="eyebrow">A peek into our world</p>
+            <h2>Made for your everyday.</h2>
+          </div>
+          <a href="https://instagram.com/pelzessentials" target="_blank" rel="noreferrer">
+            @pelzessentials ↗
           </a>
         </div>
-      </main>
-    </div>
+        <div className="social-grid">
+          {moments.map((product) => (
+            <div className="social-image" key={product.id}>
+              <Image
+                src={product.image_url}
+                alt={product.name}
+                fill
+                sizes="(max-width: 640px) 43vw, 22vw"
+              />
+            </div>
+          ))}
+        </div>
+      </section>
+    </>
   );
 }
