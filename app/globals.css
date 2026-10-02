@@ -146,6 +146,54 @@ button {
   border-radius: 50%;
   object-fit: cover;
 }
+.profile-menu {
+  position: relative;
+}
+.profile-menu-options {
+  position: absolute;
+  top: calc(100% + 14px);
+  right: 0;
+  z-index: 10;
+  width: 220px;
+  padding: 8px;
+  border: 1px solid var(--line);
+  background: var(--white);
+  box-shadow: 0 10px 28px rgba(32, 35, 31, 0.12);
+}
+.profile-menu-email {
+  overflow: hidden;
+  margin: 0;
+  padding: 9px 10px 11px;
+  border-bottom: 1px solid var(--line);
+  color: var(--muted);
+  font-size: 11px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.profile-menu-item {
+  width: 100%;
+  min-height: 40px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 0 10px;
+  border: 0;
+  background: transparent;
+  color: var(--ink);
+  font-size: 12px;
+  text-align: left;
+  cursor: pointer;
+}
+.profile-menu-item:hover {
+  background: var(--paper);
+  color: var(--forest);
+}
+.profile-menu-error {
+  margin: 4px 10px 7px;
+  color: #a33b2f;
+  font-size: 11px;
+  line-height: 1.5;
+}
 .cart-count {
   position: absolute;
   top: -5px;
@@ -1220,6 +1268,65 @@ button {
   max-width: 300px;
   margin-top: 34px !important;
   font-size: 10px !important;
+}
+.account-settings-page {
+  width: min(620px, 90%);
+  min-height: 520px;
+  margin: 0 auto;
+  padding: 76px 0 92px;
+}
+.account-settings-page > .auth-back {
+  margin: 0 0 40px;
+}
+.account-settings-page h1 {
+  margin: 0;
+  font:
+    400 42px/1.1 Georgia,
+    "Times New Roman",
+    serif;
+}
+.account-settings-intro {
+  margin: 13px 0 34px;
+  color: var(--muted);
+  font-size: 13px;
+  line-height: 1.7;
+}
+.account-settings-content {
+  border-top: 1px solid var(--line);
+}
+.account-settings-content h2 {
+  margin: 25px 0 9px;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+.account-settings-content dl {
+  margin: 0;
+}
+.account-settings-content dl > div {
+  display: grid;
+  grid-template-columns: 140px minmax(0, 1fr);
+  gap: 16px;
+  padding: 15px 0;
+  border-bottom: 1px solid var(--line);
+  font-size: 13px;
+}
+.account-settings-content dt {
+  color: var(--muted);
+}
+.account-settings-content dd {
+  overflow-wrap: anywhere;
+  margin: 0;
+}
+.account-settings-note {
+  margin: 20px 0 0;
+  color: var(--muted);
+  font-size: 12px;
+  line-height: 1.7;
+}
+.account-settings-signin {
+  margin-top: 12px;
 }
 @keyframes spin {
   to {

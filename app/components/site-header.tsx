@@ -1,9 +1,9 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
-import { Menu, ShoppingBag, UserRound, X } from "lucide-react";
+import { LogOut, Menu, Settings, ShoppingBag, UserRound, X } from "lucide-react";
 import type { User } from "@supabase/supabase-js";
 import { BrandLockup } from "@/app/components/brand-lockup";
 import { useShop } from "@/app/components/shop-provider";
@@ -11,8 +11,11 @@ import { createBrowserSupabase } from "@/lib/supabase/client";
 
 export function SiteHeader() {
   const [menuOpen, setMenuOpen] = useState(false);
+  const [profileMenuOpen, setProfileMenuOpen] = useState(false);
+  const [signOutError, setSignOutError] = useState("");
   const [user, setUser] = useState<User | null>(null);
   const [avatarFailed, setAvatarFailed] = useState(false);
+  const profileMenuRef = useRef<HTMLDivElement>(null);
   const { itemCount } = useShop();
 
   useEffect(() => {
@@ -27,6 +30,25 @@ export function SiteHeader() {
     return () => subscription.unsubscribe();
   }, []);
 
+  useEffect(() => {
+    function handlePointerDown(event: PointerEvent) {
+      if (event.target instanceof Node && !profileMenuRef.current?.contains(event.target)) {
+        setProfileMenuOpen(false);
+      }
+    }
+
+    function handleKeyDown(event: KeyboardEvent) {
+      if (event.key === "Escape") setProfileMenuOpen(false);
+    }
+
+    document.addEventListener("pointerdown", handlePointerDown);
+    document.addEventListener("keydown", handleKeyDown);
+    return () => {
+      document.removeEventListener("pointerdown", handlePointerDown);
+      document.removeEventListener("keydown", handleKeyDown);
+    };
+  }, []);
+
   const picture = user?.user_metadata.picture;
   const avatarUrl =
     typeof picture === "string"
@@ -37,6 +59,16 @@ export function SiteHeader() {
 
   function openCart() {
     window.dispatchEvent(new Event("pelz:open-cart"));
+  }
+
+  async function signOut() {
+    setSignOutError("");
+    const { error } = await createBrowserSupabase().auth.signOut();
+    if (error) {
+      setSignOutError("Sign out failed. Please try again.");
+      return;
+    }
+    setProfileMenuOpen(false);
   }
 
   return (
@@ -57,26 +89,71 @@ export function SiteHeader() {
         </Link>
       </nav>
       <div className="header-actions">
-        <Link
-          className="header-icon"
-          href="/auth/sign-in"
-          aria-label={user?.email ? `Signed in as ${user.email}` : "Sign in with Google"}
-          title={user?.email ? `Signed in as ${user.email}` : "Sign in with Google"}
-        >
-          {avatarUrl && !avatarFailed ? (
-            <Image
-              className="profile-avatar"
-              src={avatarUrl}
-              alt=""
-              width={28}
-              height={28}
-              unoptimized
-              onError={() => setAvatarFailed(true)}
-            />
-          ) : (
+        {user ? (
+          <div className="profile-menu" ref={profileMenuRef}>
+            <button
+              className="header-icon"
+              type="button"
+              aria-label="Open account menu"
+              aria-expanded={profileMenuOpen}
+              aria-controls="profile-menu-options"
+              title={user.email ?? "Account menu"}
+              onClick={() => {
+                setProfileMenuOpen((open) => !open);
+                setSignOutError("");
+              }}
+            >
+              {avatarUrl && !avatarFailed ? (
+                <Image
+                  className="profile-avatar"
+                  src={avatarUrl}
+                  alt=""
+                  width={28}
+                  height={28}
+                  unoptimized
+                  onError={() => setAvatarFailed(true)}
+                />
+              ) : (
+                <UserRound size={18} strokeWidth={1.5} />
+              )}
+            </button>
+            {profileMenuOpen && (
+              <div className="profile-menu-options" id="profile-menu-options" role="menu">
+                <p className="profile-menu-email">{user.email}</p>
+                <Link
+                  className="profile-menu-item"
+                  href="/account/settings"
+                  role="menuitem"
+                  onClick={() => setProfileMenuOpen(false)}
+                >
+                  <Settings size={16} strokeWidth={1.6} /> Settings
+                </Link>
+                <button
+                  className="profile-menu-item"
+                  type="button"
+                  role="menuitem"
+                  onClick={signOut}
+                >
+                  <LogOut size={16} strokeWidth={1.6} /> Sign out
+                </button>
+                {signOutError && (
+                  <p className="profile-menu-error" role="alert">
+                    {signOutError}
+                  </p>
+                )}
+              </div>
+            )}
+          </div>
+        ) : (
+          <Link
+            className="header-icon"
+            href="/auth/sign-in"
+            aria-label="Sign in with Google"
+            title="Sign in with Google"
+          >
             <UserRound size={18} strokeWidth={1.5} />
-          )}
-        </Link>
+          </Link>
+        )}
         <button
           className="header-icon"
           type="button"
