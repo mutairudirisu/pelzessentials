@@ -101,6 +101,10 @@ export default function App() {
   const [error, setError] = useState("");
   const oauthExchanges = useRef(new Map<string, Promise<Session>>()).current;
   const callbackFailure = useRef<string | null>(null);
+  const oauthCallbackWaiter = useRef<{
+    resolve: (session: Session) => void;
+    reject: (error: Error) => void;
+  } | null>(null);
 
   const handleOAuthCallback = useCallback(
     async (callbackUrl: string): Promise<Session | null> => {
@@ -112,6 +116,11 @@ export default function App() {
         callback.port !== expectedCallback.port ||
         callback.pathname !== expectedCallback.pathname
       ) {
+        if (callback.protocol === expectedCallback.protocol) {
+          throw new Error(
+            `The app received an OAuth callback at ${callback.origin}${callback.pathname}, but expected ${expectedCallback.origin}${expectedCallback.pathname}. Rebuild the app with the current scheme and try again.`,
+          );
+        }
         return null;
       }
 
@@ -161,6 +170,7 @@ export default function App() {
       setAccountCartId(null);
       setCartRows([]);
       setError("");
+      if (nextSession) oauthCallbackWaiter.current?.resolve(nextSession);
     });
     return () => {
       active = false;
@@ -176,11 +186,13 @@ export default function App() {
         if (active && callbackSession) {
           setSession(callbackSession);
           setError("");
+          oauthCallbackWaiter.current?.resolve(callbackSession);
         }
       } catch (callbackError) {
         if (active) {
           callbackFailure.current =
             callbackError instanceof Error ? callbackError.message : "Unknown callback error.";
+          oauthCallbackWaiter.current?.reject(new Error(callbackFailure.current));
           setError(`Google sign-in callback failed: ${callbackFailure.current}`);
         }
       }
@@ -340,6 +352,18 @@ export default function App() {
       if (oauthError) throw oauthError;
       if (!data.url) throw new Error("Supabase did not return a Google sign-in URL.");
 
+      let resolveCallback!: (session: Session) => void;
+      let rejectCallback!: (error: Error) => void;
+      const callbackSessionPromise = new Promise<Session>((resolve, reject) => {
+        resolveCallback = resolve;
+        rejectCallback = reject;
+      });
+      void callbackSessionPromise.catch(() => {});
+      oauthCallbackWaiter.current = {
+        resolve: resolveCallback,
+        reject: rejectCallback,
+      };
+
       const result = await WebBrowser.openAuthSessionAsync(data.url, redirectTo);
       let callbackSession: Session | null = null;
       if (result.type === "success") {
@@ -350,17 +374,22 @@ export default function App() {
           );
         }
       } else if (result.type === "cancel" || result.type === "dismiss") {
-        const deadline = Date.now() + 15000;
+        const deadline = Date.now() + 60000;
         while (!callbackSession && Date.now() < deadline) {
           if (callbackFailure.current) throw new Error(callbackFailure.current);
           const { data: currentSession, error: sessionError } = await supabase.auth.getSession();
           if (sessionError) throw sessionError;
           callbackSession = currentSession.session;
-          if (!callbackSession) await new Promise((resolve) => setTimeout(resolve, 250));
+          if (!callbackSession) {
+            callbackSession = await Promise.race([
+              callbackSessionPromise,
+              new Promise<null>((resolve) => setTimeout(() => resolve(null), 250)),
+            ]);
+          }
         }
         if (!callbackSession) {
           throw new Error(
-            `Google sign-in closed without creating a session. Confirm Supabase allows this callback: ${redirectTo}. If Expo Go also says it cannot connect to Expo CLI, restart Metro with npx expo start --tunnel and scan the new QR code.`,
+            `Google sign-in returned to the app without a session. Supabase accepts this callback: ${redirectTo}, but no sign-in callback reached the app. Install the latest Pelz APK, or restart Expo with npx expo start --tunnel --clear and scan its current QR code. After Google, the browser must return to Pelz Essentials.`,
           );
         }
       } else {
@@ -372,6 +401,7 @@ export default function App() {
     } catch (signInError) {
       setError(signInError instanceof Error ? signInError.message : "Google sign-in failed.");
     } finally {
+      oauthCallbackWaiter.current = null;
       setBusy(false);
     }
   }
