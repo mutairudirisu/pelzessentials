@@ -1,4 +1,5 @@
 import Image from "next/image";
+import { Download } from "lucide-react";
 import { HeroSlider, type HeroSlide } from "@/app/components/hero-slider";
 import { ShopSection } from "@/app/components/shop-section";
 import { getCatalog } from "@/lib/catalog-server";
@@ -119,6 +120,20 @@ export default async function Home() {
             </div>
           ))}
         </div>
+      </section>
+      <section className="app-download" aria-labelledby="app-download-title">
+        <p className="eyebrow">Pelz, wherever you go</p>
+        <h2 id="app-download-title">Take your favorites with you.</h2>
+        <p>Download our Android app and keep your bag in sync across devices.</p>
+        <a
+          className="button app-download-button"
+          href="/downloads/Pelz-Essentials-Android.apk"
+          download
+        >
+          <Download size={16} aria-hidden="true" />
+          Download the Android app
+        </a>
+        <span className="app-download-note">Android APK · 29 MB</span>
       </section>
     </>
   );

@@ -48,7 +48,7 @@ Apply all migrations in `web/supabase/migrations/` before testing shared carts. 
 
    The `preview` profile in `mobile/eas.json` produces an APK. EAS needs an Expo account and the first build may ask to link the project. Confirm that the public Supabase URL and anon key are configured in the EAS build environment before building; do not add a service-role key to the mobile app.
 
-   A self-contained local release APK is available at `mobile/dist/Pelz-Essentials-Android.apk`. It is signed with the local Android debug key for device installation and review; use EAS for a separately managed submission/release signing key. A Gradle `debug` APK is not standalone because it requires Metro.
+   A self-contained local release APK is available at `mobile/dist/Pelz-Essentials-Android.apk`. It is signed with the local Android debug key for device installation and review; use EAS for a separately managed submission/release signing key. A Gradle `debug` APK is not standalone because it requires Metro. The website download button serves the checked-in copy at `web/public/downloads/Pelz-Essentials-Android.apk`; replace both copies after building a newer APK.
 
 3. Install and test the APK on an Android device. Sign in to the website and app with the same Google account, then add, change, and remove a cart item on both sides.
 4. Upload the APK to Google Drive or another accessible file-sharing service and enable download access. Submit that download link, this repository's source link, and a single continuous screen recording showing the website sign-in, mobile sign-in, and cart synchronization.

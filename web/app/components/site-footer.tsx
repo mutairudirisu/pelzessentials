@@ -16,6 +16,9 @@ export function SiteFooter() {
           <Link href="/#shop">Home comforts</Link>
           <Link href="/#shop">Bags &amp; everyday</Link>
           <Link href="/#our-story">Our story</Link>
+          <a href="/downloads/Pelz-Essentials-Android.apk" download>
+            Download our Android app
+          </a>
         </div>
         <div className="footer-column">
           <h3>We&apos;re here</h3>

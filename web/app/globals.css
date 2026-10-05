@@ -751,6 +751,39 @@ button {
 .social-image:hover img {
   transform: scale(1.04);
 }
+.app-download {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 64px 24px 72px;
+  background: #f1eee7;
+  text-align: center;
+}
+.app-download .eyebrow {
+  margin: 0 0 12px;
+}
+.app-download h2 {
+  margin: 0;
+  font:
+    400 36px/1.15 Georgia,
+    "Times New Roman",
+    serif;
+}
+.app-download > p:not(.eyebrow) {
+  max-width: 420px;
+  margin: 14px 0 24px;
+  color: var(--muted);
+  font-size: 13px;
+  line-height: 1.7;
+}
+.app-download-button {
+  text-decoration: none;
+}
+.app-download-note {
+  margin-top: 11px;
+  color: var(--muted);
+  font-size: 10px;
+}
 .site-footer {
   padding: 62px 5.2% 25px;
   border-top: 3px solid var(--gold);
@@ -1608,6 +1641,13 @@ button {
   }
   .social-heading h2 {
     font-size: 26px;
+  }
+  .app-download {
+    padding: 52px 6%;
+  }
+  .app-download h2 {
+    max-width: 14ch;
+    font-size: 30px;
   }
   .social-grid {
     grid-template-columns: repeat(2, 1fr);
