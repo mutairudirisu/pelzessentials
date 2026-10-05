@@ -2,6 +2,19 @@
 
 # dependencies
 /node_modules
+/web/node_modules
+/web/.next
+/web/out
+/web/.vercel
+/web/coverage
+/web/*.tsbuildinfo
+/web/next-env.d.ts
+/mobile/node_modules
+/mobile/.expo
+/mobile/dist
+/mobile/dist-*/
+/mobile/android
+/mobile/ios
 /.pnp
 .pnp.*
 .yarn/*
@@ -13,7 +26,7 @@
 # testing
 /coverage
 
-# next.js
+# next.js (legacy root output)
 /.next/
 /out/
 

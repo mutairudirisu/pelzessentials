@@ -1,0 +1,18 @@
+{
+  "expo": {
+    "name": "Pelz Essentials",
+    "slug": "pelz-essentials",
+    "scheme": "pelzessentials",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "userInterfaceStyle": "light",
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "com.pelzessentials.shop"
+    },
+    "android": {
+      "package": "com.pelzessentials.shop"
+    },
+    "plugins": ["expo-font"]
+  }
+}

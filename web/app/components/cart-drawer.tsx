@@ -5,10 +5,12 @@ import Link from "next/link";
 import { Minus, Plus, ShoppingBag, X } from "lucide-react";
 import { useEffect, useState } from "react";
 import { formatNaira, useShop } from "@/app/components/shop-provider";
+import { createBrowserSupabase } from "@/lib/supabase/client";
 
 export function CartDrawer() {
   const [open, setOpen] = useState(false);
-  const { lines, subtotal, deliveryFee, total, setQuantity } = useShop();
+  const [signedIn, setSignedIn] = useState(false);
+  const { lines, subtotal, deliveryFee, total, setQuantity, cartError } = useShop();
 
   useEffect(() => {
     function show() {
@@ -23,6 +25,15 @@ export function CartDrawer() {
       window.removeEventListener("pelz:open-cart", show);
       window.removeEventListener("pelz:close-cart", hide);
     };
+  }, []);
+
+  useEffect(() => {
+    const supabase = createBrowserSupabase();
+    supabase.auth.getSession().then(({ data }) => setSignedIn(Boolean(data.session)));
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange((_event, session) => setSignedIn(Boolean(session)));
+    return () => subscription.unsubscribe();
   }, []);
 
   useEffect(() => {
@@ -51,6 +62,19 @@ export function CartDrawer() {
             <X size={18} />
           </button>
         </div>
+        {cartError && (
+          <p className="form-error" role="alert">
+            {cartError}
+          </p>
+        )}
+        {!signedIn && (
+          <p className="cart-sync-note">
+            <Link href="/auth/sign-in" onClick={close}>
+              Sign in with Google
+            </Link>{" "}
+            to sync your bag with the Pelz mobile app.
+          </p>
+        )}
         {lines.length === 0 ? (
           <div className="cart-empty">
             <ShoppingBag size={27} strokeWidth={1.3} />
