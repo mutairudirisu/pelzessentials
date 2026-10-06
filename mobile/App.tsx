@@ -99,6 +99,7 @@ export default function App() {
   const [loadingProducts, setLoadingProducts] = useState(true);
   const [busy, setBusy] = useState(false);
   const [profileMenuOpen, setProfileMenuOpen] = useState(false);
+  const [profilePhotoFailed, setProfilePhotoFailed] = useState(false);
   const [error, setError] = useState("");
   const oauthExchanges = useRef(new Map<string, Promise<Session>>()).current;
   const callbackFailure = useRef<string | null>(null);
@@ -106,6 +107,15 @@ export default function App() {
     resolve: (session: Session) => void;
     reject: (error: Error) => void;
   } | null>(null);
+  const profilePhotoUrl = (() => {
+    const metadata = session?.user.user_metadata;
+    const avatarUrl = metadata?.avatar_url ?? metadata?.picture;
+    return typeof avatarUrl === "string" && avatarUrl.length > 0 ? avatarUrl : null;
+  })();
+
+  useEffect(() => {
+    setProfilePhotoFailed(false);
+  }, [profilePhotoUrl]);
 
   const handleOAuthCallback = useCallback(
     async (callbackUrl: string): Promise<Session | null> => {
@@ -681,6 +691,13 @@ export default function App() {
           >
             {busy ? (
               <ActivityIndicator size="small" color="#614a38" />
+            ) : session && profilePhotoUrl && !profilePhotoFailed ? (
+              <Image
+                source={{ uri: profilePhotoUrl }}
+                style={styles.profilePhoto}
+                onError={() => setProfilePhotoFailed(true)}
+                accessibilityLabel="Google profile photo"
+              />
             ) : (
               <Ionicons name="person-circle-outline" size={30} color="#705941" />
             )}
@@ -1095,6 +1112,13 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
     borderRadius: 21,
+  },
+  profilePhoto: {
+    width: 34,
+    height: 34,
+    borderRadius: 17,
+    borderWidth: 1,
+    borderColor: "#e8e0d6",
   },
   profileMenu: {
     position: "absolute",
