@@ -38,9 +38,15 @@ Authentication is handled by Supabase Auth using its Google provider:
 1. In Google Cloud Console, configure the OAuth consent screen and create an OAuth client with application type **Web application**.
 2. Add the Supabase callback shown in **Supabase → Authentication → Providers → Google** to Google Cloud's authorized redirect URIs. It has the form `https://<project-ref>.supabase.co/auth/v1/callback`.
 3. Paste the Google client ID and secret into Supabase's Google provider settings and enable the provider.
-4. In **Supabase → Authentication → URL Configuration**, set the site URL (for local development, `http://localhost:3000`) and allow `http://localhost:3000/auth/callback`. Add the production callback when deploying.
+4. In **Supabase → Authentication → URL Configuration**, set the site URL to `https://pelzessentials.vercel.app` and allow these exact redirect URLs:
+   - `https://pelzessentials.vercel.app/auth/callback` for the production website.
+   - `pelzessentials://auth/callback` for the installed Android app.
+   - `exp://**/--/auth/callback` for Expo Go, or the exact callback URL shown by the running Expo app if your project does not accept the wildcard.
+   - `http://localhost:3000/auth/callback` for local web development.
 
-Google Cloud's authorized redirect URI must be the Supabase callback shown in the Google provider settings (`https://<project-ref>.supabase.co/auth/v1/callback`), not the website or mobile app callback. Supabase redirects back to the website or app after Google completes sign-in.
+The website builds its callback from the current origin, so production uses `https://pelzessentials.vercel.app/auth/callback` and local development uses its local origin. Supabase Auth uses PKCE and exchanges the returned `code` in the server callback route.
+
+Google Cloud's authorized redirect URI must be the Supabase callback shown in the Google provider settings (`https://naxmpslzonzigouwmugg.supabase.co/auth/v1/callback`), not the website or mobile app callback. Supabase redirects back to the website or app after Google completes sign-in.
 
 The account icon starts Google OAuth. Checkout is also available as a guest.
 
