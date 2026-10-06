@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
-import { Download, LogOut, Menu, Settings, ShoppingBag, UserRound, X } from "lucide-react";
+import { LogOut, Menu, Settings, ShoppingBag, UserRound, X } from "lucide-react";
 import type { User } from "@supabase/supabase-js";
 import { BrandLockup } from "@/app/components/brand-lockup";
 import { useShop } from "@/app/components/shop-provider";
@@ -93,7 +93,13 @@ export function SiteHeader() {
           download
           onClick={() => setMenuOpen(false)}
         >
-          <Download size={14} aria-hidden="true" />
+          <Image
+            src="/pelzlogo.png"
+            alt=""
+            width={20}
+            height={20}
+            className="app-download-icon"
+          />
           Download app
         </a>
       </nav>

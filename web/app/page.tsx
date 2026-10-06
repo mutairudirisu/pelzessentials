@@ -1,5 +1,4 @@
 import Image from "next/image";
-import { Download } from "lucide-react";
 import { HeroSlider, type HeroSlide } from "@/app/components/hero-slider";
 import { ShopSection } from "@/app/components/shop-section";
 import { getCatalog } from "@/lib/catalog-server";
@@ -130,7 +129,13 @@ export default async function Home() {
           href="/downloads/Pelz-Essentials-Android.apk"
           download
         >
-          <Download size={16} aria-hidden="true" />
+          <Image
+            src="/pelzlogo.png"
+            alt=""
+            width={22}
+            height={22}
+            className="app-download-icon"
+          />
           Download the Android app
         </a>
         <span className="app-download-note">Android APK · 29 MB</span>

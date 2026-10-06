@@ -134,6 +134,12 @@ button {
 .main-nav .main-nav-download:hover {
   color: var(--gold);
 }
+.app-download-icon {
+  flex: 0 0 auto;
+  width: 20px;
+  height: 20px;
+  object-fit: contain;
+}
 .header-actions {
   justify-self: end;
   display: flex;
