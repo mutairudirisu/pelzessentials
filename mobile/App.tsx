@@ -98,6 +98,7 @@ export default function App() {
   const [savedProducts, setSavedProducts] = useState<string[]>([]);
   const [loadingProducts, setLoadingProducts] = useState(true);
   const [busy, setBusy] = useState(false);
+  const [profileMenuOpen, setProfileMenuOpen] = useState(false);
   const [error, setError] = useState("");
   const oauthExchanges = useRef(new Map<string, Promise<Session>>()).current;
   const callbackFailure = useRef<string | null>(null);
@@ -664,18 +665,74 @@ export default function App() {
               <Text style={styles.tagline}>Beauty &amp; Style</Text>
             </View>
           </View>
-          {session ? (
-            <Pressable onPress={() => void signOut()} style={styles.accountButton}>
-              <Text style={styles.accountButtonText}>Sign out</Text>
-            </Pressable>
-          ) : (
-            <Pressable
-              onPress={() => void signInWithGoogle()}
-              disabled={busy}
-              style={styles.accountButton}
-            >
-              <Text style={styles.accountButtonText}>{busy ? "Opening…" : "Sign in"}</Text>
-            </Pressable>
+          <Pressable
+            onPress={() => {
+              if (session) {
+                setProfileMenuOpen((open) => !open);
+              } else {
+                void signInWithGoogle();
+              }
+            }}
+            disabled={busy}
+            style={styles.profileButton}
+            accessibilityRole="button"
+            accessibilityLabel={session ? "Open profile menu" : "Sign in with Google"}
+            accessibilityState={{ expanded: profileMenuOpen, disabled: busy }}
+          >
+            {busy ? (
+              <ActivityIndicator size="small" color="#614a38" />
+            ) : (
+              <Ionicons name="person-circle-outline" size={30} color="#705941" />
+            )}
+          </Pressable>
+          {session && profileMenuOpen && (
+            <View style={styles.profileMenu}>
+              <Text style={styles.profileMenuEmail} numberOfLines={1}>
+                {session.user.email}
+              </Text>
+              <View style={styles.profileMenuDivider} />
+              <Pressable
+                style={styles.profileMenuItem}
+                onPress={() => {
+                  setProfileMenuOpen(false);
+                  setScreen("account");
+                }}
+              >
+                <Ionicons name="settings-outline" size={18} color="#765b46" />
+                <Text style={styles.profileMenuItemText}>Account settings</Text>
+              </Pressable>
+              <Pressable
+                style={styles.profileMenuItem}
+                onPress={() => {
+                  setProfileMenuOpen(false);
+                  setScreen("saved");
+                }}
+              >
+                <Ionicons name="heart-outline" size={18} color="#765b46" />
+                <Text style={styles.profileMenuItemText}>Saved pieces</Text>
+              </Pressable>
+              <Pressable
+                style={styles.profileMenuItem}
+                onPress={() => {
+                  setProfileMenuOpen(false);
+                  setScreen("bag");
+                }}
+              >
+                <Ionicons name="bag-handle-outline" size={18} color="#765b46" />
+                <Text style={styles.profileMenuItemText}>Shopping bag</Text>
+              </Pressable>
+              <View style={styles.profileMenuDivider} />
+              <Pressable
+                style={styles.profileMenuItem}
+                onPress={() => {
+                  setProfileMenuOpen(false);
+                  void signOut();
+                }}
+              >
+                <Ionicons name="log-out-outline" size={18} color="#a34f47" />
+                <Text style={styles.profileMenuSignOut}>Sign out</Text>
+              </Pressable>
+            </View>
           )}
         </View>
         {error ? (
@@ -1019,6 +1076,7 @@ const styles = StyleSheet.create({
   root: { flex: 1 },
   safeArea: { flex: 1, backgroundColor: "#fbf9f5" },
   header: {
+    position: "relative",
     paddingHorizontal: 20,
     paddingVertical: 16,
     flexDirection: "row",
@@ -1031,14 +1089,47 @@ const styles = StyleSheet.create({
   brandLogo: { width: 42, height: 42 },
   brand: { color: "#533f32", fontSize: 15, fontWeight: "700", letterSpacing: 2 },
   tagline: { color: "#8d7a69", fontSize: 12, marginTop: 3 },
-  accountButton: {
-    borderWidth: 1,
-    borderColor: "#d5c7b8",
-    paddingHorizontal: 14,
-    paddingVertical: 9,
-    borderRadius: 20,
+  profileButton: {
+    width: 42,
+    height: 42,
+    alignItems: "center",
+    justifyContent: "center",
+    borderRadius: 21,
   },
-  accountButtonText: { color: "#594332", fontSize: 13, fontWeight: "600" },
+  profileMenu: {
+    position: "absolute",
+    top: 66,
+    right: 16,
+    zIndex: 10,
+    elevation: 8,
+    minWidth: 205,
+    maxWidth: 280,
+    backgroundColor: "#fff",
+    borderColor: "#eee8e1",
+    borderWidth: 1,
+    borderRadius: 12,
+    paddingVertical: 8,
+    shadowColor: "#332922",
+    shadowOffset: { width: 0, height: 5 },
+    shadowOpacity: 0.14,
+    shadowRadius: 12,
+  },
+  profileMenuEmail: {
+    color: "#8a7e73",
+    fontSize: 11,
+    paddingHorizontal: 14,
+    paddingVertical: 8,
+  },
+  profileMenuDivider: { height: StyleSheet.hairlineWidth, backgroundColor: "#e9e1d8" },
+  profileMenuItem: {
+    minHeight: 42,
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 10,
+    paddingHorizontal: 14,
+  },
+  profileMenuItemText: { color: "#493c31", fontSize: 13, fontWeight: "500" },
+  profileMenuSignOut: { color: "#a34f47", fontSize: 13, fontWeight: "600" },
   screenContent: { flex: 1 },
   tabBar: {
     flexDirection: "row",
