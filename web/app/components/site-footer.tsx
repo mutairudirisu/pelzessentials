@@ -1,6 +1,7 @@
 import { ArrowUpRight, Camera, Phone } from "lucide-react";
 import Link from "next/link";
 import { BrandLockup } from "@/app/components/brand-lockup";
+import { androidApkDownloadUrl } from "@/lib/android-app";
 
 export function SiteFooter() {
   return (
@@ -16,7 +17,7 @@ export function SiteFooter() {
           <Link href="/#shop">Home comforts</Link>
           <Link href="/#shop">Bags &amp; everyday</Link>
           <Link href="/#our-story">Our story</Link>
-          <a href="/downloads/Pelz-Essentials-Android.apk" download>
+          <a href={androidApkDownloadUrl}>
             Download our Android app
           </a>
         </div>

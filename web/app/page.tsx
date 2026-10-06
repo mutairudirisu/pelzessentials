@@ -1,6 +1,7 @@
 import Image from "next/image";
 import { HeroSlider, type HeroSlide } from "@/app/components/hero-slider";
 import { ShopSection } from "@/app/components/shop-section";
+import { androidApkDownloadUrl } from "@/lib/android-app";
 import { getCatalog } from "@/lib/catalog-server";
 
 export default async function Home() {
@@ -126,8 +127,7 @@ export default async function Home() {
         <p>Download our Android app and keep your bag in sync across devices.</p>
         <a
           className="button app-download-button"
-          href="/downloads/Pelz-Essentials-Android.apk"
-          download
+          href={androidApkDownloadUrl}
         >
           <Image
             src="/pelzlogo.png"
@@ -138,7 +138,7 @@ export default async function Home() {
           />
           Download the Android app
         </a>
-        <span className="app-download-note">Android APK · 29 MB</span>
+        <span className="app-download-note">Android APK · 74 MB</span>
       </section>
     </>
   );

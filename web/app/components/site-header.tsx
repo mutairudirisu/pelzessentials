@@ -7,6 +7,7 @@ import { LogOut, Menu, Settings, ShoppingBag, UserRound, X } from "lucide-react"
 import type { User } from "@supabase/supabase-js";
 import { BrandLockup } from "@/app/components/brand-lockup";
 import { useShop } from "@/app/components/shop-provider";
+import { androidApkDownloadUrl } from "@/lib/android-app";
 import { createBrowserSupabase } from "@/lib/supabase/client";
 
 export function SiteHeader() {
@@ -89,8 +90,7 @@ export function SiteHeader() {
         </Link>
         <a
           className="main-nav-download"
-          href="/downloads/Pelz-Essentials-Android.apk"
-          download
+          href={androidApkDownloadUrl}
           onClick={() => setMenuOpen(false)}
         >
           <Image
