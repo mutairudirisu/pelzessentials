@@ -5,9 +5,13 @@ type CallbackFailure = "cancelled" | "provider_error" | "missing_code" | "exchan
 
 function safeNextPath(value: string | null, requestUrl: string) {
   if (!value) return "/";
-  const requestedUrl = new URL(value, requestUrl);
-  if (requestedUrl.origin !== new URL(requestUrl).origin) return "/";
-  return `${requestedUrl.pathname}${requestedUrl.search}${requestedUrl.hash}`;
+  try {
+    const requestedUrl = new URL(value, requestUrl);
+    if (requestedUrl.origin !== new URL(requestUrl).origin) return "/";
+    return `${requestedUrl.pathname}${requestedUrl.search}${requestedUrl.hash}`;
+  } catch {
+    return "/";
+  }
 }
 
 function failureRedirect(request: NextRequest, failure: CallbackFailure, nextPath: string) {

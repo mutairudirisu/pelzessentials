@@ -25,8 +25,8 @@ export default function SignInPage() {
         "We couldn't finish signing you in. Check your connection and try again.",
     };
 
-    createBrowserSupabase()
-      .auth.getSession()
+    Promise.resolve()
+      .then(() => createBrowserSupabase().auth.getSession())
       .then(({ data, error: sessionError }) => {
         if (!active) return;
         if (sessionError) {
