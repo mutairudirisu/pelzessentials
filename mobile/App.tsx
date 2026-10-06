@@ -134,24 +134,53 @@ export default function App() {
       if (callbackError) throw new Error(callbackError);
 
       const code = callbackParams.get("code") ?? callbackHash.get("code");
-      if (!code) throw new Error("Google returned to the app without an authorization code.");
-
-      let exchange = oauthExchanges.get(code);
-      if (!exchange) {
-        exchange = (async () => {
-          const { data, error: exchangeError } = await supabase.auth.exchangeCodeForSession(code);
-          if (exchangeError) throw exchangeError;
-          if (!data.session) {
-            throw new Error(
-              "Supabase accepted the Google callback but did not return a session. Check the Google provider configuration in Supabase Auth.",
-            );
-          }
-          return data.session;
-        })();
-        oauthExchanges.set(code, exchange);
+      if (code) {
+        const exchangeKey = `pkce:${code}`;
+        let exchange = oauthExchanges.get(exchangeKey);
+        if (!exchange) {
+          exchange = (async () => {
+            const { data, error: exchangeError } =
+              await supabase.auth.exchangeCodeForSession(code);
+            if (exchangeError) throw exchangeError;
+            if (!data.session) {
+              throw new Error(
+                "Supabase accepted the Google callback but did not return a session. Check the Google provider configuration in Supabase Auth.",
+              );
+            }
+            return data.session;
+          })();
+          oauthExchanges.set(exchangeKey, exchange);
+        }
+        return exchange;
       }
 
-      return exchange;
+      const accessToken =
+        callbackParams.get("access_token") ?? callbackHash.get("access_token");
+      const refreshToken =
+        callbackParams.get("refresh_token") ?? callbackHash.get("refresh_token");
+      if (accessToken && refreshToken) {
+        const exchangeKey = `tokens:${accessToken}`;
+        let exchange = oauthExchanges.get(exchangeKey);
+        if (!exchange) {
+          exchange = (async () => {
+            const { data, error: sessionError } = await supabase.auth.setSession({
+              access_token: accessToken,
+              refresh_token: refreshToken,
+            });
+            if (sessionError) throw sessionError;
+            if (!data.session) {
+              throw new Error("Supabase accepted the Google tokens but did not return a session.");
+            }
+            return data.session;
+          })();
+          oauthExchanges.set(exchangeKey, exchange);
+        }
+        return exchange;
+      }
+
+      throw new Error(
+        "Google returned to the app, but Supabase did not include a sign-in code or session tokens. In Google Cloud Console, set the authorized redirect URI to the Supabase callback shown under Supabase > Authentication > Providers > Google (https://<project-ref>.supabase.co/auth/v1/callback). Do not use pelzessentials://auth/callback as Google's redirect URI.",
+      );
     },
     [oauthExchanges],
   );

@@ -40,6 +40,8 @@ Authentication is handled by Supabase Auth using its Google provider:
 3. Paste the Google client ID and secret into Supabase's Google provider settings and enable the provider.
 4. In **Supabase → Authentication → URL Configuration**, set the site URL (for local development, `http://localhost:3000`) and allow `http://localhost:3000/auth/callback`. Add the production callback when deploying.
 
+Google Cloud's authorized redirect URI must be the Supabase callback shown in the Google provider settings (`https://<project-ref>.supabase.co/auth/v1/callback`), not the website or mobile app callback. Supabase redirects back to the website or app after Google completes sign-in.
+
 The account icon starts Google OAuth. Checkout is also available as a guest.
 
 ## Mobile app

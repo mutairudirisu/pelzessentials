@@ -2,6 +2,7 @@
   "expo": {
     "name": "Pelz Essentials",
     "slug": "pelz-essentials",
+    "owner": "dirisumutairu",
     "scheme": "pelzessentials",
     "version": "1.0.0",
     "orientation": "portrait",
@@ -13,6 +14,13 @@
     "android": {
       "package": "com.pelzessentials.shop"
     },
-    "plugins": ["expo-font"]
+    "plugins": [
+      "expo-font"
+    ],
+    "extra": {
+      "eas": {
+        "projectId": "e7b0ccc5-97c3-4cf0-906f-4e0f52eda9ab"
+      }
+    }
   }
 }
